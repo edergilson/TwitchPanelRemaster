@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ícone simplificado inspirado no logotipo da Twitch, usando
+     currentColor para que o Plasma o recolora automaticamente conforme
+     o tema (claro/escuro) e o estilo de ícones ativo. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <path fill="currentColor" d="M4 2 2 6.5V20h5.5V22l3-2h3.5L20 14V2H4zm14 11-3 3h-3.5l-3 2v-2H5V4h13v9z"/>
+  <rect fill="currentColor" x="14.5" y="6.5" width="2" height="5"/>
+  <rect fill="currentColor" x="9.5" y="6.5" width="2" height="5"/>
+</svg>

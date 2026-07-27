@@ -1,0 +1,140 @@
+# Translation of Twitch Live Remaster Plasmoid to Brazilian Portuguese.
+
+# Copyright (C) 2024
+
+# This file is distributed under the same license as the Twitch Live Remaster Plasmoid package.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Twitch Live Remaster Plasmoid 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00-0300\n"
+"Last-Translator: Seu Nome seu.email@exemplo.com\n"
+"Language-Team: pt_BR kde-i18n-pt_BR@kde.org\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+# --- FollowedStreamsList.qml ---
+
+msgid "No live channels at the moment."
+msgstr "Nenhum canal ao vivo no momento."
+
+msgid "Not connected. Go to settings."
+msgstr "Desconectado. Vá para as configurações."
+
+# --- main.qml ---
+
+msgid "is live now!"
+msgstr "está ao vivo agora!"
+
+# --- StreamDelegate.qml ---
+
+msgid "%1h %2m"
+msgstr "%1h %2m"
+
+msgid "%1m"
+msgstr "%1m"
+
+# --- Account.qml ---
+
+msgid "Twitch Account"
+msgstr "Conta da Twitch"
+
+msgid "Time limit exceeded. Try to connect again."
+msgstr "Tempo limite excedido. Clique em conectar novamente."
+
+msgid "Error: %1"
+msgstr "Falha: %1"
+
+msgid "Successfully connected!"
+msgstr "Conectado com sucesso!"
+
+msgid "Status:"
+msgstr "Status:"
+
+msgid "Connected as %1"
+msgstr "Conectado como %1"
+
+msgid "Not connected"
+msgstr "Não conectado"
+
+msgid "Disconnect"
+msgstr "Desconectar"
+
+msgid "Connect with Twitch"
+msgstr "Conectar com a Twitch"
+
+msgid "Error on trying to connect: %1"
+msgstr "Erro ao tentar conectar: %1"
+
+msgid "Open Twitch in your browser and authorize. The code is: %1"
+msgstr "Abra a Twitch no seu navegador e autorize. O código é: %1"
+
+msgid "Access Token:"
+msgstr "Token de Acesso:"
+
+# --- General.qml ---
+
+msgid "General"
+msgstr "Geral"
+
+msgid "Display:"
+msgstr "Exibir:"
+
+msgid "Profile image"
+msgstr "Imagem de perfil"
+
+msgid "Stream title"
+msgstr "Título da transmissão"
+
+msgid "Viewers"
+msgstr "Espectadores"
+
+msgid "Live since time"
+msgstr "Tempo de transmissão"
+
+msgid "Online badge"
+msgstr "Selo de canais online"
+
+msgid "Notifications"
+msgstr "Notificações"
+
+msgid "Refresh each:"
+msgstr "Atualizar a cada:"
+
+msgctxt "Ex: 60 seconds"
+msgid "%1 s"
+msgstr "%1 s"
+
+msgid "Sort by:"
+msgstr "Ordenar por:"
+
+msgid "Viewers (Descending)"
+msgstr "Espectadores (Decrescente)"
+
+msgid "Channel Name"
+msgstr "Nome do Canal"
+
+# --- Playback.qml ---
+
+msgid "Playback"
+msgstr "Reprodução"
+
+msgid "On click:"
+msgstr "Ao clicar:"
+
+msgid "Open in browser"
+msgstr "Abrir no navegador"
+
+msgid "Open in streamlink"
+msgstr "Abrir no streamlink"
+
+msgid "Media Player (ex: mpv):"
+msgstr "Reprodutor de Mídia (ex: mpv):"
+
+msgid "Extra args:"
+msgstr "Argumentos extras:"

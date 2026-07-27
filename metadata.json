@@ -1,0 +1,17 @@
+{
+    "KPlugin": {
+        "Id": "org.kde.plasma.twitchpanelremaster",
+        "Name": "Twitch Live",
+        "Version": "1.0",
+        "Description": "List all your live now Twitch streams.",
+        "Icon": "twitch",
+        "Authors": [
+            {
+                "Name": "Eder Silva",
+                "Email": "edergilson@gmail.com"
+            }
+        ]
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
