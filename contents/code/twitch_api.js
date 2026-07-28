@@ -51,3 +51,23 @@ function getUsers(userIds, token, callback) {
 function getCachedAvatar(userId) {
     return avatarCache[userId] || "";
 }
+
+function refreshAccessToken(refreshToken, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://id.twitch.tv/oauth2/token");
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                callback(null, response);
+            } else {
+                callback({status: xhr.status, data: xhr.responseText}, null);
+            }
+        }
+    }
+
+    var data = "grant_type=refresh_token&refresh_token=" + encodeURIComponent(refreshToken) + "&client_id=" + encodeURIComponent(CLIENT_ID);
+    xhr.send(data);
+}

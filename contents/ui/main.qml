@@ -12,18 +12,13 @@ PlasmoidItem {
 
     property int liveCount: streamsModel.count
     property bool isConnected: Plasmoid.configuration.accessToken !== ""
-
-    // Novas propriedades de estado para debug e UI
     property string lastError: ""
     property bool isLoading: false
-
-    // Variáveis para rastrear os canais e evitar SPAM de notificações
     property var liveStreamIds: []
     property bool isFirstLoad: true
 
     Plasmoid.backgroundHints: PlasmaCore.Types.DefaultBackground
 
-    // Componente de Notificação Nativa do KDE
     KNotifications.Notification {
         id: streamNotification
         eventId: "notification"
@@ -51,7 +46,6 @@ PlasmoidItem {
 
     fullRepresentation: Component {
         FollowedStreamsList {
-            // Injetamos as variáveis cruzando a barreira do componente!
             listModel: streamsModel
             isLoading: root.isLoading
             lastError: root.lastError
@@ -66,23 +60,19 @@ PlasmoidItem {
     Timer {
         id: refreshTimer
         interval: Math.max(30, Plasmoid.configuration.refreshInterval) * 1000
-        running: root.isConnected && root.expanded
+        running: root.isConnected
         repeat: true
         onTriggered: fetchStreams()
     }
 
-    // Garante atualização automática no momento em que você clica em "Aplicar"
     Connections {
         target: Plasmoid.configuration
 
-        // Gatilho 1: Quando você loga, o Plasma salva o novo ID
         function onUserIdChanged() {
             fetchStreams();
         }
 
-        // Gatilho 2: Quando você desconecta, limpando o token
         function onAccessTokenChanged() {
-            // Se deslogou, reseta o histórico para não bugar no próximo login
             if (Plasmoid.configuration.accessToken === "") {
                 root.liveStreamIds = [];
                 root.isFirstLoad = true;
@@ -90,27 +80,23 @@ PlasmoidItem {
             fetchStreams();
         }
 
-        // Gatilho 3: Se você for na aba Geral e mudar a ordenação
         function onSortModeChanged() {
             fetchStreams();
         }
     }
 
-    // Chama a API imediatamente caso o widget já inicie expandido (ex: no Desktop)
     Component.onCompleted: {
         fetchStreams();
     }
 
     onExpandedChanged: {
-        if (root.expanded) fetchStreams();
+        fetchStreams();
     }
 
-    // Função auxiliar que formata o balão de notificação com HTML e dispara
     function fireSingleNotification(stream, avatarUrl) {
         streamNotification.title = stream.user_name + " " + i18n("is live now!");
 
         if (avatarUrl) {
-            // Injetamos a imagem da internet dentro do texto usando HTML (Rich Text)
             streamNotification.text = "<img src='" + avatarUrl + "' width='42' height='42'>  " + stream.title;
         } else {
             streamNotification.text = stream.title;
@@ -137,6 +123,24 @@ PlasmoidItem {
                 root.isLoading = false;
 
                 if (err) {
+                    if (err.status === 401 && Plasmoid.configuration.refreshToken !== "") {
+                        root.lastError = i18n("Token expired. Refreshing background session...");
+                        root.isLoading = true;
+
+                        TwitchAPI.refreshAccessToken(Plasmoid.configuration.refreshToken, function(refErr, refData) {
+                            if (refErr) {
+                                root.lastError = i18n("Session expired completely. Please go to settings and reconnect.");
+                                root.isLoading = false;
+                            } else {
+                                if (refData.refresh_token) {
+                                    Plasmoid.configuration.refreshToken = refData.refresh_token;
+                                }
+                                Plasmoid.configuration.accessToken = refData.access_token;
+                            }
+                        });
+                        return;
+                    }
+
                     root.lastError = "Error on Twitch API: " + (err.status ? err.status + " " + err.data : JSON.stringify(err));
                     return;
                 }
@@ -148,7 +152,6 @@ PlasmoidItem {
 
                 let streams = data.data;
 
-                // --- 1. LÓGICA DO SISTEMA DE NOTIFICAÇÕES ---
                 let currentIds = [];
                 let newLiveStreams = [];
 
@@ -156,7 +159,6 @@ PlasmoidItem {
                     let s = streams[i];
                     currentIds.push(s.id); // Guardamos o ID único da transmissão
 
-                    // Se a extensão já carregou antes e essa transmissão é inédita...
                     if (!root.isFirstLoad && root.liveStreamIds.indexOf(s.id) === -1) {
                         newLiveStreams.push(s);
                     }
@@ -165,7 +167,6 @@ PlasmoidItem {
                 root.liveStreamIds = currentIds;
                 root.isFirstLoad = false;
 
-                // Disparo inteligente das notificações
                 if (newLiveStreams.length !== 0 && Plasmoid.configuration.showNotifications) {
                     for (let k = 0; k < newLiveStreams.length; k++) {
                         let s = newLiveStreams[k];
@@ -174,7 +175,6 @@ PlasmoidItem {
                         if (avatar) {
                             root.fireSingleNotification(s, avatar);
                         } else {
-                            // Se a foto não estiver no cache, baixa ela rapidinho na API da Twitch
                             TwitchAPI.getUsers([s.user_id], Plasmoid.configuration.accessToken, function(uErr, uData) {
                                 let fetchedAvatar = "";
                                 if (!uErr && uData && uData.data && uData.data.length > 0) {
@@ -186,9 +186,7 @@ PlasmoidItem {
                         }
                     }
                 }
-                // --- FIM DA LÓGICA DE NOTIFICAÇÕES ---
 
-                // --- 2. PREENCHIMENTO DA UI (LISTA VISUAL) ---
                 if (Plasmoid.configuration.sortMode === "viewers") {
                     streams.sort((a, b) => b.viewer_count - a.viewer_count);
                 } else {
@@ -218,18 +216,15 @@ PlasmoidItem {
                     });
                 }
 
-                // Dispara a busca das fotos faltantes em background
                 if (missingAvatars.length > 0) {
                     missingAvatars = missingAvatars.slice(0, 100);
                     TwitchAPI.getUsers(missingAvatars, Plasmoid.configuration.accessToken, function(uErr, uData) {
                         if (!uErr && uData && uData.data) {
-                            // Atualiza o cache JS
                             for (let j = 0; j < uData.data.length; j++) {
                                 let user = uData.data[j];
                                 TwitchAPI.avatarCache[user.id] = user.profile_image_url;
                             }
 
-                            // Atualiza os itens da lista dinamicamente
                             for (let k = 0; k < streamsModel.count; k++) {
                                 let item = streamsModel.get(k);
                                 if (TwitchAPI.avatarCache[item.userId]) {
