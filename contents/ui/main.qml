@@ -5,6 +5,7 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PC3
 import org.kde.kirigami as Kirigami
 import org.kde.notification as KNotifications
+import org.kde.plasma.plasma5support as Plasma5Support
 import "../code/twitch_api.js" as TwitchAPI
 
 PlasmoidItem {
@@ -16,6 +17,7 @@ PlasmoidItem {
     property bool isLoading: false
     property var liveStreamIds: []
     property bool isFirstLoad: true
+    property var notificationQueue: ({})
 
     Plasmoid.backgroundHints: PlasmaCore.Types.DefaultBackground
 
@@ -24,6 +26,36 @@ PlasmoidItem {
         eventId: "notification"
         componentName: "plasma_workspace"
         iconName: "twitch"
+    }
+
+    Plasma5Support.DataSource {
+        id: avatarDownloader
+        engine: "executable"
+        connectedSources: []
+
+        onNewData: function(sourceName, data) {
+            let exitCode = data["exit code"];
+            disconnectSource(sourceName);
+
+            let queuedData = root.notificationQueue[sourceName];
+            if (queuedData) {
+                let stream = queuedData.stream;
+                let localPath = queuedData.localPath;
+                delete root.notificationQueue[sourceName];
+
+                streamNotification.title = stream.user_name + " " + i18n("is live now!");
+
+                if (exitCode === 0) {
+                    streamNotification.iconName = localPath;
+                    streamNotification.text = stream.title;
+                } else {
+                    streamNotification.iconName = "twitch";
+                    streamNotification.text = "<img src='" + queuedData.originalUrl + "' width='42' height='42'>  " + stream.title;
+                }
+
+                streamNotification.sendEvent();
+            }
+        }
     }
 
     compactRepresentation: Component {
@@ -94,15 +126,24 @@ PlasmoidItem {
     }
 
     function fireSingleNotification(stream, avatarUrl) {
-        streamNotification.title = stream.user_name + " " + i18n("is live now!");
-
         if (avatarUrl) {
-            streamNotification.text = "<img src='" + avatarUrl + "' width='42' height='42'>  " + stream.title;
-        } else {
-            streamNotification.text = stream.title;
-        }
+            let localPath = "/tmp/twitch_avatar_" + stream.user_id + ".png";
 
-        streamNotification.sendEvent();
+            let cmd = "curl -s -L --max-time 8 -o " + localPath + " '" + avatarUrl + "'";
+
+            root.notificationQueue[cmd] = {
+                stream: stream,
+                localPath: localPath,
+                originalUrl: avatarUrl
+            };
+
+            avatarDownloader.connectSource(cmd);
+        } else {
+            streamNotification.title = stream.user_name + " " + i18n("is live now!");
+            streamNotification.iconName = "twitch";
+            streamNotification.text = stream.title;
+            streamNotification.sendEvent();
+        }
     }
 
     function fetchStreams() {
@@ -157,9 +198,9 @@ PlasmoidItem {
 
                 for (let i = 0; i < streams.length; i++) {
                     let s = streams[i];
-                    currentIds.push(s.id); // Guardamos o ID único da transmissão
+                    currentIds.push(s.id);
 
-                    if (!root.isFirstLoad && root.liveStreamIds.indexOf(s.id) === -1) {
+                    if (root.liveStreamIds.indexOf(s.id) === -1) {
                         newLiveStreams.push(s);
                     }
                 }
