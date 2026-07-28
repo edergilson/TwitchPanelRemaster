@@ -31,6 +31,13 @@ msgstr "Desconectado. Vá para as configurações."
 msgid "is live now!"
 msgstr "está ao vivo agora!"
 
+msgid "Token expired. Refreshing background session..."
+msgstr "Token expirado. Atualizando sessão nos bastidores..."
+
+msgid "Session expired completely. Please go to settings and reconnect."
+msgstr "Sessão expirada completamente. Por favor vá para as configurações e reconecte."
+
+
 # --- StreamDelegate.qml ---
 
 msgid "%1h %2m"
