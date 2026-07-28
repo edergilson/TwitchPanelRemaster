@@ -4,7 +4,7 @@
         "Name": "Twitch Live",
         "Version": "1.0",
         "Description": "List all your live now Twitch streams.",
-        "Icon": "twitch",
+        "Icon": "/assets/twitch.svg",
         "Authors": [
             {
                 "Name": "Eder Silva",
